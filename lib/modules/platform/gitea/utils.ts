@@ -70,7 +70,7 @@ export function getMergeMethod(
     case 'merge-commit':
       return 'merge';
     case 'rebase':
-      return 'rebase-merge';
+      return strategy;
     case 'squash':
       return strategy;
     case 'auto':

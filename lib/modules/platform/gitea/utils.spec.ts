@@ -50,7 +50,7 @@ describe('modules/platform/gitea/utils', () => {
     ${undefined}      | ${null}
     ${'fast-forward'} | ${'rebase'}
     ${'merge-commit'} | ${'merge'}
-    ${'rebase'}       | ${'rebase-merge'}
+    ${'rebase'}       | ${'rebase'}
     ${'squash'}       | ${'squash'}
   `('getMergeMethod("$value") == "$expected"', ({ value, expected }) => {
     expect(getMergeMethod(value)).toBe(expected);
