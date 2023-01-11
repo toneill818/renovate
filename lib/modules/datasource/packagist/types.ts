@@ -2,6 +2,7 @@ import type { ReleaseResult } from '../types';
 
 export interface PackageMeta {
   includes?: Record<string, { sha256: string }>;
+  'metadata-url'?: string;
   packages: Record<string, RegistryFile>;
   'provider-includes': Record<string, { sha256: string }>;
   providers: Record<string, { sha256: string }>;
@@ -14,6 +15,7 @@ export interface RegistryFile {
 }
 export interface RegistryMeta {
   files?: RegistryFile[];
+  metadataUrl?: string;
   providerPackages: Record<string, string>;
   providersUrl?: string;
   providersLazyUrl?: string;
@@ -27,6 +29,7 @@ export interface PackagistFile {
 }
 
 export interface AllPackages {
+  metadataUrl?: string;
   packages: Record<string, RegistryFile>;
   providersUrl?: string;
   providersLazyUrl?: string;

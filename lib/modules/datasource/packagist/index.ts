@@ -75,6 +75,9 @@ export class PackagistDatasource extends Datasource {
         meta.includesFiles.push(file);
       }
     }
+    if (res['metadata-url']) {
+      meta.metadataUrl = res['metadata-url'];
+    }
     if (res['providers-url']) {
       meta.providersUrl = res['providers-url'];
     }
@@ -176,32 +179,36 @@ export class PackagistDatasource extends Datasource {
       files,
       includesFiles,
       providerPackages,
+      metadataUrl,
     } = registryMeta;
-    if (files) {
-      const queue = files.map(
-        (file) => (): Promise<PackagistFile> =>
-          this.getPackagistFile(regUrl, file)
-      );
-      const resolvedFiles = await p.all(queue);
-      for (const res of resolvedFiles) {
-        for (const [name, val] of Object.entries(res.providers)) {
-          providerPackages[name] = val.sha256;
+    const includesPackages: Record<string, ReleaseResult> = {};
+    if (!metadataUrl) {
+      if (files) {
+        const queue = files.map(
+          (file) => (): Promise<PackagistFile> =>
+            this.getPackagistFile(regUrl, file)
+        );
+        const resolvedFiles = await p.all(queue);
+        for (const res of resolvedFiles) {
+          for (const [name, val] of Object.entries(res.providers)) {
+            providerPackages[name] = val.sha256;
+          }
         }
       }
-    }
-    const includesPackages: Record<string, ReleaseResult> = {};
-    if (includesFiles) {
-      for (const file of includesFiles) {
-        const res = await this.getPackagistFile(regUrl, file);
-        if (res.packages) {
-          for (const [key, val] of Object.entries(res.packages)) {
-            const dep = PackagistDatasource.extractDepReleases(val);
-            includesPackages[key] = dep;
+      if (includesFiles) {
+        for (const file of includesFiles) {
+          const res = await this.getPackagistFile(regUrl, file);
+          if (res.packages) {
+            for (const [key, val] of Object.entries(res.packages)) {
+              const dep = PackagistDatasource.extractDepReleases(val);
+              includesPackages[key] = dep;
+            }
           }
         }
       }
     }
     const allPackages: AllPackages = {
+      metadataUrl,
       packages,
       providersUrl,
       providersLazyUrl,
@@ -247,16 +254,13 @@ export class PackagistDatasource extends Datasource {
     name: string
   ): Promise<ReleaseResult | null> {
     try {
-      if (regUrl === 'https://packagist.org') {
-        const packagistResult = await this.packagistOrgLookup(name);
-        return packagistResult;
-      }
       const allPackages = await this.getAllPackages(regUrl);
       // istanbul ignore if: needs test
       if (!allPackages) {
         return null;
       }
       const {
+        metadataUrl,
         packages,
         providersUrl,
         providersLazyUrl,
@@ -278,6 +282,8 @@ export class PackagistDatasource extends Datasource {
             .replace('%package%', name)
             .replace('%hash%', providerPackages[name])
         );
+      } else if (metadataUrl) {
+        pkgUrl = URL.resolve(regUrl, metadataUrl.replace('%package%', name));
       } else if (providersLazyUrl) {
         pkgUrl = URL.resolve(
           regUrl,
