@@ -139,6 +139,7 @@ export class PackagistDatasource extends Datasource {
   }
 
   private static extractDepReleases(versions: RegistryFile): ReleaseResult {
+    // TODO: support v2 minification?
     const dep: ReleaseResult = { releases: [] };
     // istanbul ignore if
     if (!versions) {
@@ -183,6 +184,7 @@ export class PackagistDatasource extends Datasource {
     } = registryMeta;
     const includesPackages: Record<string, ReleaseResult> = {};
     if (!metadataUrl) {
+      // Don't load these files if the registry supports composer v2 API
       if (files) {
         const queue = files.map(
           (file) => (): Promise<PackagistFile> =>
@@ -284,6 +286,7 @@ export class PackagistDatasource extends Datasource {
         );
       } else if (metadataUrl) {
         pkgUrl = URL.resolve(regUrl, metadataUrl.replace('%package%', name));
+        // TODO: also need to resolve ~dev packages
       } else if (providersLazyUrl) {
         pkgUrl = URL.resolve(
           regUrl,
