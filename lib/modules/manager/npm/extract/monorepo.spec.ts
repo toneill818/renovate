@@ -63,8 +63,8 @@ describe('modules/manager/npm/extract/monorepo', () => {
       expect(packageFiles).toMatchSnapshot();
       expect(packageFiles[1].managerData?.lernaJsonFile).toBe('lerna.json');
       expect(
-        packageFiles.some((packageFile) =>
-          packageFile.deps?.some((dep) => dep.isInternal)
+        packageFiles.some(
+          (packageFile) => packageFile.deps?.some((dep) => dep.isInternal)
         )
       ).toBeTrue();
     });
@@ -116,8 +116,8 @@ describe('modules/manager/npm/extract/monorepo', () => {
       expect(packageFiles).toMatchSnapshot();
       expect(packageFiles[1].managerData?.lernaJsonFile).toBe('lerna.json');
       expect(
-        packageFiles.some((packageFile) =>
-          packageFile.deps?.some((dep) => dep.isInternal)
+        packageFiles.some(
+          (packageFile) => packageFile.deps?.some((dep) => dep.isInternal)
         )
       ).toBeTrue();
     });

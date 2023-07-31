@@ -21,7 +21,7 @@ export async function readFileAsXmlDocument(
 }
 
 const defaultRegistries = defaultRegistryUrls.map(
-  (registryUrl) => ({ url: registryUrl } as Registry)
+  (registryUrl) => ({ url: registryUrl }) as Registry
 );
 
 export function getDefaultRegistries(): Registry[] {
